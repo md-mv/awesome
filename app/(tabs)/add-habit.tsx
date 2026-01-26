@@ -33,7 +33,6 @@ export default function AddHabitScreen() {
     //make sure the user exists before adding this
     if (!user) return;
     try {
-
       //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
       await databases.createRow(
         DATABASE_ID,
@@ -47,7 +46,7 @@ export default function AddHabitScreen() {
           streak_count: 0,
           last_completed: new Date(),
           created_at: new Date(),
-        }
+        },
       );
 
       router.back();
