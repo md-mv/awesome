@@ -86,8 +86,8 @@ async function getData() {
 //  getTasksAi();
 
 export default function AddHabitScreen() {
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [goal, setGoal] = useState<string>("");
+  // const [description, setDescription] = useState<string>("");
   const [frequency, setFrequency] = useState<Frequency>("daily");
 
   const [error, setError] = useState<string>("");
@@ -96,7 +96,7 @@ export default function AddHabitScreen() {
   const theme = useTheme();
   const { user } = useAuth();
 
-  const [habitDrafts, setHabitDrafts] = useState<HabitDraft[]>();
+  const [habitDrafts, setHabitDrafts] = useState<HabitDraft[]>([]);
   const [habits, setHabits] = useState<Habit[]>();
   const [completedHabits, setCompletedHabits] = useState<string[]>();
   const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
@@ -152,96 +152,160 @@ export default function AddHabitScreen() {
     }
   };
 
-  const loaded = false;
+  // let loaded = false;
   const getTasksAi = async () => {
     // const result = await getData();
 
     // await resolveAfter3Minutes();
 
     performance.mark("request to AI API sent");
-    const task = "happiness";
+    // const task = "happiness";
+    //   const task = "happiness";
     // const response = await fetch(`${API_HOST}` + "/items/" + task);
 
-    const response = await fetch(`${API_HOST}/goals`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: task }),
-    });
-    const result = await response.json();
-    setHabitDrafts(result as HabitDraft[]);
-    console.log(result);
-    console.log(habitDrafts);
+    try {
+      let data;
+      let result;
+      let jsonCorrect = false;
+      while (!jsonCorrect) {
+        try {
+          const response = await fetch(`${API_HOST}/goals`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: goal }),
+          });
+          result = await response.json();
+          data = JSON.parse(result);
+          jsonCorrect = true;
+        } catch (er) {
+          if (er instanceof Error) {
+            setError(er.message);
+            return;
+          }
+          setError("There was an error creating a habit");
+        }
+      }
+      console.log(result);
+      console.log("tasks: ");
+      const tasks = data.tasks;
 
-    performance.mark("request to AI API received");
+      let res: HabitDraft[] = [];
 
-    performance.measure(
-      "loadTime",
-      "request to AI API sent",
-      "request to AI API received",
-    );
+      //     tasks.forEach(task => {
+      //     console.log(`${task.name} is ${person.age} years old.`);
+      // });
+      for (let i in tasks) {
+        // console.log(`${i.name} is ${i.age} years old.`);
+        let gg: HabitDraft = {
+          title: tasks[i].name,
+          description: tasks[i].description,
+        };
+        // setHabitDrafts(
+        //   // Replace the state
+        //   [
+        //     // with a new array
+        //     ...habitDrafts, // that contains all the old items
+        //     { title: tasks[i].name, description: tasks[i].description }, // and one new item at the end
+        //   ],
+        // );
+        res.push(gg);
+        // res.push(tasks[i].name, tasks[i].description);
+      }
 
-    const measure = performance.getEntriesByName("loadTime")[0];
-    const loadTime = measure.duration / 1000; // Convert to seconds
+      // console.log(res);
+      await setHabitDrafts(res as HabitDraft[]);
+      // loaded = true;
+      //     const newArr = tasks.map(task => {
+      //     return { name: task.name, description: task.description };
+      // });
 
-    console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
-    //     const client = Instructor({
-    //   client: ollama,
-    //   mode: "FUNCTIONS"**
-    // })
+      // console.log(newArr);
+      // console.log(tasks);
 
-    // const UserSchema = z.object({
-    //   // Description will be used in the prompt
-    //   age: z.number().describe("The age of the user"),
-    //   name: z.string()
-    // })
+      // console.log(result);
+      console.log("habit drafts: ");
+      // setHabitDrafts(data.tasks as HabitDraft[]);
+      console.log(habitDrafts);
+      console.log("hopefully it reaches here");
+      // console.log(habitDrafts);
 
-    // // User will be of type z.infer<typeof UserSchema>
-    // const user = await client.chat.completions.create({
-    //   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
-    //   model: "llama3",
-    //   response_model: {
-    //     schema: UserSchema,
-    //     name: "User"
-    //   }
-    // })
+      performance.mark("request to AI API received");
 
-    // console.log(user)
+      performance.measure(
+        "loadTime",
+        "request to AI API sent",
+        "request to AI API received",
+      );
 
-    // for await (const part of response) {
-    //   process.stdout.write(part.message.content);
-    //   console.log(part.message.content);
-    // }
+      const measure = performance.getEntriesByName("loadTime")[0];
+      const loadTime = measure.duration / 1000; // Convert to seconds
 
-    // //make sure the user exists before adding this
-    // if (!user) return;
-    // try {
+      console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
+      //     const client = Instructor({
+      //   client: ollama,
+      //   mode: "FUNCTIONS"**
+      // })
 
-    //   //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
-    //   await databases.createRow(
-    //     DATABASE_ID,
-    //     HABITS_COLLECTION_ID,
-    //     ID.unique(),
-    //     {
-    //       user_id: user.$id,
-    //       title,
-    //       description,
-    //       frequency,
-    //       streak_count: 0,
-    //       last_completed: new Date(),
-    //       created_at: new Date(),
-    //     }
-    //   );
+      // const UserSchema = z.object({
+      //   // Description will be used in the prompt
+      //   age: z.number().describe("The age of the user"),
+      //   name: z.string()
+      // })
 
-    //   router.back();
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     setError(error.message);
-    //     return;
-    //   }
-    //   setError("There was an error creating a habit");
-    // }
+      // // User will be of type z.infer<typeof UserSchema>
+      // const user = await client.chat.completions.create({
+      //   messages: [{ role: "user", content: "Jason Liu is 30 years old" }],
+      //   model: "llama3",
+      //   response_model: {
+      //     schema: UserSchema,
+      //     name: "User"
+      //   }
+      // })
+
+      // console.log(user)
+
+      // for await (const part of response) {
+      //   process.stdout.write(part.message.content);
+      //   console.log(part.message.content);
+      // }
+
+      // //make sure the user exists before adding this
+      // if (!user) return;
+      // try {
+
+      //   //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
+      //   await databases.createRow(
+      //     DATABASE_ID,
+      //     HABITS_COLLECTION_ID,
+      //     ID.unique(),
+      //     {
+      //       user_id: user.$id,
+      //       title,
+      //       description,
+      //       frequency,
+      //       streak_count: 0,
+      //       last_completed: new Date(),
+      //       created_at: new Date(),
+      //     }
+      //   );
+
+      //   router.back();
+      // } catch (error) {
+      //   if (error instanceof Error) {
+      //     setError(error.message);
+      //     return;
+      //   }
+      //   setError("There was an error creating a habit");
+      // }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+        return;
+      }
+      setError("There was an error creating a habit");
+    }
   };
 
   //async, because we are going to be accessing db stuff
@@ -339,22 +403,17 @@ export default function AddHabitScreen() {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* habitDrafts?.length === 0 */}
-        {!loaded ? (
+        {habitDrafts?.length === 0 ? (
           <View style={styles.emptyState}>
             <TextInput
               label="I want to achieve: "
               mode="outlined"
               placeholder="six pack"
-              onChangeText={setTitle}
+              onChangeText={setGoal}
               style={styles.input}
             />
-            <Button
-              mode="contained"
-              onPress={getTasksAi}
-              disabled={!title || !description}
-            >
-              Add AI Habits to here
+            <Button mode="contained" onPress={getTasksAi} disabled={!goal}>
+              Add Goal
             </Button>
           </View>
         ) : (
@@ -408,7 +467,7 @@ export default function AddHabitScreen() {
                 <Button
                   mode="contained"
                   onPress={handleSubmit}
-                  disabled={!title || !description}
+                  disabled={!habitDrafts}
                 >
                   Add Habits To Routine
                 </Button>
