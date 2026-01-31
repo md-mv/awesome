@@ -1,10 +1,16 @@
-import { API_HOST } from "@/lib/appwrite";
+import {
+  API_HOST,
+  DATABASE_ID,
+  databases,
+  HABITS_COLLECTION_ID,
+} from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
 import { Habit } from "@/type/database.type";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { ID } from "react-native-appwrite";
 import { ScrollView, Swipeable } from "react-native-gesture-handler";
 import { Button, Surface, Text, TextInput, useTheme } from "react-native-paper";
 
@@ -310,44 +316,137 @@ export default function AddHabitScreen() {
 
   //async, because we are going to be accessing db stuff
   const handleSubmit = async () => {
+    console.log("handleSubmit: habit drafts: ");
+    console.log(habitDrafts);
     //make sure the user exists before adding this
     if (!user) return;
-    // try {
-    //   //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
-    //   await databases.createRow(
-    //     DATABASE_ID,
-    //     HABITS_COLLECTION_ID,
-    //     ID.unique(),
-    //     {
-    //       user_id: user.$id,
-    //       title,
-    //       description,
-    //       frequency,
-    //       streak_count: 0,
-    //       last_completed: new Date(),
-    //       created_at: new Date(),
-    //     },
-    //   );
+    try {
+      //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
 
-    //   router.back();
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     setError(error.message);
-    //     return;
-    //   }
-    //   setError("There was an error creating a habit");
-    // }
+      // const result = habitDrafts.map((item) => handleAddHabitDraft(item.title));
+
+      if (!user) return;
+      try {
+        //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
+
+        for (let ii in habitDrafts) {
+          console.log(ii);
+          const foundDescription = await habitDrafts[ii].title;
+          console.log(foundDescription);
+          await databases.createRow(
+            DATABASE_ID,
+            HABITS_COLLECTION_ID,
+            ID.unique(),
+            {
+              user_id: user.$id,
+              title: habitDrafts[ii].title,
+              description: habitDrafts[ii].description,
+              frequency,
+              streak_count: 0,
+              last_completed: new Date(),
+              created_at: new Date(),
+            },
+          );
+
+          //delete from array
+          await setHabitDrafts(habitDrafts.filter((a) => a.title !== ii));
+        }
+        // router.back();
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+          return;
+        }
+        setError("There was an error creating a habit");
+      }
+
+      // const result = habitDrafts.map(item => pick(item, ['key', 'value']));
+      //  for (let draft in habitDrafts) {
+
+      //   await handleAddHabitDraft(draft.title);
+      //   // console.log(`${i.name} is ${i.age} years old.`);
+
+      //   // setHabitDrafts(
+      //   //   // Replace the state
+      //   //   [
+      //   //     // with a new array
+      //   //     ...habitDrafts, // that contains all the old items
+      //   //     { title: tasks[i].name, description: tasks[i].description }, // and one new item at the end
+      //   //   ],
+      //   // );
+
+      //   // res.push(tasks[i].name, tasks[i].description);
+      // }
+      // await databases.createRow(
+      //   DATABASE_ID,
+      //   HABITS_COLLECTION_ID,
+      //   ID.unique(),
+      //   {
+      //     user_id: user.$id,
+      //     title,
+      //     description,
+      //     frequency,
+      //     streak_count: 0,
+      //     last_completed: new Date(),
+      //     created_at: new Date(),
+      //   },
+      // );
+
+      router.back();
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+        return;
+      }
+      setError("There was an error creating a habit");
+    }
   };
 
   const handleDeleteHabitDraft = async (id: string) => {
     try {
       // await databases.deleteRow(DATABASE_ID, HABITS_COLLECTION_ID, id);
+      //delete from array
+      await setHabitDrafts(habitDrafts.filter((a) => a.title !== id));
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleAddHabitDraft = async (id: string) => {
+    //make sure the user exists before adding this
+    if (!user) return;
+    try {
+      //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
+      const foundDescription = await habitDrafts.find(
+        (item) => item.title === id,
+      );
+      await databases.createRow(
+        DATABASE_ID,
+        HABITS_COLLECTION_ID,
+        ID.unique(),
+        {
+          user_id: user.$id,
+          title: id,
+          description: foundDescription,
+          frequency,
+          streak_count: 0,
+          last_completed: new Date(),
+          created_at: new Date(),
+        },
+      );
+
+      //delete from array
+      await setHabitDrafts(habitDrafts.filter((a) => a.title !== id));
+
+      // router.back();
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+        return;
+      }
+      setError("There was an error creating a habit");
+    }
+
     // if (!user || completedHabits?.includes(id)) return;
     // try {
     //   const currentDate = new Date();
@@ -402,6 +501,13 @@ export default function AddHabitScreen() {
 
   return (
     <View style={styles.container}>
+      <Button
+        mode="contained"
+        onPress={handleSubmit}
+        disabled={habitDrafts?.length === 0}
+      >
+        Add Habits To Routine
+      </Button>
       <ScrollView showsVerticalScrollIndicator={false}>
         {habitDrafts?.length === 0 ? (
           <View style={styles.emptyState}>
@@ -464,13 +570,6 @@ export default function AddHabitScreen() {
                     </View>
                   </View> */}
                 </View>
-                <Button
-                  mode="contained"
-                  onPress={handleSubmit}
-                  disabled={!habitDrafts}
-                >
-                  Add Habits To Routine
-                </Button>
               </Surface>
             </Swipeable>
           ))

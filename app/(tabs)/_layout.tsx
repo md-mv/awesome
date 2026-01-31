@@ -24,7 +24,7 @@ export default function TabsLayout() {
         options={{
           title: "Today's Habits",
           //size adapts the tab screen
-          tabBarIcon: ({ color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="calendar-today"
               size={size}
@@ -39,7 +39,7 @@ export default function TabsLayout() {
         options={{
           title: "Streaks",
           //size adapts the tab screen
-          tabBarIcon: ({ color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="chart-line"
               size={size}
@@ -49,14 +49,29 @@ export default function TabsLayout() {
         }}
       />
 
-       <Tabs.Screen
+      <Tabs.Screen
         name="add-habit"
         options={{
           title: "Add Habit",
           //size adapts the tab screen
-          tabBarIcon: ({  color, size}) => (
-           <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
-        ),
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="plus-circle"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="add-habit-ai"
+        options={{
+          title: "Add Goal",
+          //size adapts the tab screen
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="robot" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
