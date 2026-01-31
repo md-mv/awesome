@@ -10,6 +10,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
+// import AnimatedLoader from "react-native-animated-loader";
 import { ID } from "react-native-appwrite";
 import { ScrollView, Swipeable } from "react-native-gesture-handler";
 import { Button, Surface, Text, TextInput, useTheme } from "react-native-paper";
@@ -107,6 +108,60 @@ export default function AddHabitScreen() {
   const [completedHabits, setCompletedHabits] = useState<string[]>();
   const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
+  const [loading, setLoading] = useState<Boolean>(false);
+  // let loading = false;
+
+  const [currentText, setCurrentText] = useState("");
+
+  const texts = [
+    "Searching for WiFi",
+    "Calling the waiter",
+    "Asking for password",
+    "Connecting to the internet",
+    "Searching for GPU",
+    "Browsing Amazon",
+    "Looking for money to buy GPU",
+    "Did not find the money to buy GPU",
+    "Searching for CPU",
+    "Found CPU",
+    "Searching for AI model on the internet",
+    "Found llama 3",
+    "Sending the request to llama 3",
+    "checking the format",
+    "resending request",
+    "Connecting to database",
+    "Looking up NASA records",
+    "Flying to the moon",
+    "Flying back",
+    "smoking outside",
+    "made a kid",
+    "it should have already given back the answer",
+    "usually it does",
+    "hold on tight",
+    "tighter",
+    "you really should consider buying premium",
+  ];
+  let point = -1;
+  useEffect(() => {
+    // if (loading) {
+    const intervalId = setInterval(() => {
+      setCurrentText((prevText) => {
+        // const currentIndex = texts.indexOf(prevText);
+        if (point >= texts.length - 1) {
+          point = -1;
+        }
+        point = point + 1;
+
+        // const nextIndex = point % texts.length;
+        console.log(texts[point]);
+        return texts[point];
+      });
+    }, 5000);
+
+    return () => clearInterval(intervalId); // Clean up on unmount
+    // }
+  }, []);
+
   //   function resolveAfterMinutes() {
   //   return new Promise((resolve) => {
   //     setTimeout(() => {
@@ -114,6 +169,13 @@ export default function AddHabitScreen() {
   //     }, 3*60*1000);
   //   });
   // }
+
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    setInterval(() => {
+      setVisible(!visible);
+    }, 2000);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -163,7 +225,7 @@ export default function AddHabitScreen() {
     // const result = await getData();
 
     // await resolveAfter3Minutes();
-
+    setLoading(true);
     performance.mark("request to AI API sent");
     // const task = "happiness";
     //   const task = "happiness";
@@ -249,6 +311,7 @@ export default function AddHabitScreen() {
       const loadTime = measure.duration / 1000; // Convert to seconds
 
       console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
+      setLoading(false);
       //     const client = Instructor({
       //   client: ollama,
       //   mode: "FUNCTIONS"**
@@ -349,7 +412,9 @@ export default function AddHabitScreen() {
           );
 
           //delete from array
-          await setHabitDrafts(habitDrafts.filter((a) => a.title !== ii));
+          await setHabitDrafts(
+            habitDrafts.filter((a) => a.title !== habitDrafts[ii].title),
+          );
         }
         // router.back();
       } catch (error) {
@@ -414,6 +479,9 @@ export default function AddHabitScreen() {
 
   const handleAddHabitDraft = async (id: string) => {
     //make sure the user exists before adding this
+
+    console.log("add habit handle");
+    console.log(id);
     if (!user) return;
     try {
       //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
@@ -427,7 +495,7 @@ export default function AddHabitScreen() {
         {
           user_id: user.$id,
           title: id,
-          description: foundDescription,
+          description: foundDescription?.description,
           frequency,
           streak_count: 0,
           last_completed: new Date(),
@@ -501,28 +569,65 @@ export default function AddHabitScreen() {
 
   return (
     <View style={styles.container}>
-      <Button
-        mode="contained"
-        onPress={handleSubmit}
-        disabled={habitDrafts?.length === 0}
-      >
-        Add Habits To Routine
-      </Button>
+      {/* {habitDrafts?.length === 0 ? (
+        
+      ) : null} */}
+
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View>
+          <Text disabled={habitDrafts?.length === 0} style={styles.goalText}>
+            Your Goal was: {goal}
+          </Text>
+        </View>
+        <Button
+          mode="contained"
+          onPress={handleSubmit}
+          disabled={habitDrafts?.length === 0}
+        >
+          Add Habits To Routine
+        </Button>
+
         {habitDrafts?.length === 0 ? (
-          <View style={styles.emptyState}>
+          <View style={styles.containerAdd}>
             <TextInput
               label="I want to achieve: "
               mode="outlined"
               placeholder="six pack"
               onChangeText={setGoal}
-              style={styles.input}
+              style={styles.inputAdd}
             />
             <Button mode="contained" onPress={getTasksAi} disabled={!goal}>
               Add Goal
             </Button>
+
+            {/* <AnimatedLoader
+              visible={visible}
+              overlayColor="rgba(255,255,255,0.75)"
+              animationStyle={styles.lottie}
+              speed={1}
+            >
+              <Text>Doing something...</Text>
+            </AnimatedLoader> */}
+
+            {/* {loading ? (
+              <LoaderKitView
+                style={{ width: 50, height: 50 }}
+                name={"BallPulse"}
+                animationSpeedMultiplier={1.0} // speed up/slow down animation, default: 1.0, larger is faster
+                color={"#7c4dff"} // Optional: color can be: 'red', 'green',... or '#ddd', '#ffffff',...
+              />
+            ) : null} */}
+
+            {loading ? (
+              <View>
+                <Text style={styles.loadingText}>{currentText}</Text>
+              </View>
+            ) : null}
           </View>
         ) : (
+          // <View>
+          // <Text style={styles.loadingText}>{goal}</Text>
+
           habitDrafts?.map((habitDraft, key) => (
             <Swipeable
               ref={(ref) => {
@@ -601,6 +706,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
+    // flex: 1,
     marginBottom: 8,
   },
   frequencyContainer: {
@@ -710,5 +816,30 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     marginTop: 2,
     paddingRight: 16,
+  },
+  lottie: {
+    width: 100,
+    height: 100,
+  },
+  loadingText: {
+    marginTop: 50,
+    color: "#ff9800",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  goalText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#22223b",
+  },
+  containerAdd: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#f5f5f5",
+    justifyContent: "center",
+  },
+  inputAdd: {
+    marginBottom: 8,
   },
 });
