@@ -1,26 +1,17 @@
-import {
-  API_HOST,
-  DATABASE_ID,
-  HABITS_COLLECTION_ID,
-  databases,
-} from "@/lib/appwrite";
+import { API_HOST } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
 import { Habit } from "@/type/database.type";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { ID } from "react-native-appwrite";
 import { ScrollView, Swipeable } from "react-native-gesture-handler";
-import {
-  Button,
-  SegmentedButtons,
-  Surface,
-  Text,
-  TextInput,
-  useTheme,
-} from "react-native-paper";
+import { Button, Surface, Text, TextInput, useTheme } from "react-native-paper";
 
+export interface HabitDraft {
+  title: string;
+  description: string;
+}
 const FREQUENCIES = ["daily", "weekly", "monthly"];
 
 //key value store, key is from FREQUENCIES array, value is a number
@@ -88,6 +79,10 @@ async function getData() {
   }
 }
 
+// const { user } = useAuth();
+
+//call this function every time the user changes
+
 //  getTasksAi();
 
 export default function AddHabitScreen() {
@@ -101,6 +96,7 @@ export default function AddHabitScreen() {
   const theme = useTheme();
   const { user } = useAuth();
 
+  const [habitDrafts, setHabitDrafts] = useState<HabitDraft[]>();
   const [habits, setHabits] = useState<Habit[]>();
   const [completedHabits, setCompletedHabits] = useState<string[]>();
   const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
@@ -113,11 +109,56 @@ export default function AddHabitScreen() {
   //   });
   // }
 
+  useEffect(() => {
+    if (user) {
+      // const habitsChannel = `databases.${DATABASE_ID}.tables.${HABITS_COLLECTION_ID}.rows`;
+      // const habitsSubscription = client.subscribe(
+      //   habitsChannel,
+      //   (response: RealtimeResponse) => {
+      //     if (response.events.includes("databases.*.tables.*.rows.*.create")) {
+      //       fetchHabits();
+      //     } else if (
+      //       response.events.includes("databases.*.tables.*.rows.*.update")
+      //     ) {
+      //       fetchHabits();
+      //     } else if (
+      //       response.events.includes("databases.*.tables.*.rows.*.delete")
+      //     ) {
+      //       fetchHabits();
+      //     }
+      //   },
+      // );
+      // fetchHabits();
+      // //this function when called will cancel and unsubscribe the subscription
+      // return () => {
+      //   habitsSubscription();
+      // };
+    }
+  }, [user]); //dependency array in [] (is called wehn var in this array changes)
+
+  const fetchHabits = async () => {
+    try {
+      // //if user == null then put "" instead
+      // const response = await databases.listRows(
+      //   DATABASE_ID,
+      //   HABITS_COLLECTION_ID,
+      //   [Query.equal("user_id", user?.$id ?? "")],
+      // );
+      // console.log(response.rows);
+      // //Habit interface should extend the type  which is returned by response.rows
+      // setHabits(response.rows as Habit[]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const loaded = false;
   const getTasksAi = async () => {
     // const result = await getData();
 
     // await resolveAfter3Minutes();
 
+    performance.mark("request to AI API sent");
     const task = "happiness";
     // const response = await fetch(`${API_HOST}` + "/items/" + task);
 
@@ -129,7 +170,22 @@ export default function AddHabitScreen() {
       body: JSON.stringify({ name: task }),
     });
     const result = await response.json();
+    setHabitDrafts(result as HabitDraft[]);
     console.log(result);
+    console.log(habitDrafts);
+
+    performance.mark("request to AI API received");
+
+    performance.measure(
+      "loadTime",
+      "request to AI API sent",
+      "request to AI API received",
+    );
+
+    const measure = performance.getEntriesByName("loadTime")[0];
+    const loadTime = measure.duration / 1000; // Convert to seconds
+
+    console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
     //     const client = Instructor({
     //   client: ollama,
     //   mode: "FUNCTIONS"**
@@ -192,74 +248,71 @@ export default function AddHabitScreen() {
   const handleSubmit = async () => {
     //make sure the user exists before adding this
     if (!user) return;
-    try {
-      //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
-      await databases.createRow(
-        DATABASE_ID,
-        HABITS_COLLECTION_ID,
-        ID.unique(),
-        {
-          user_id: user.$id,
-          title,
-          description,
-          frequency,
-          streak_count: 0,
-          last_completed: new Date(),
-          created_at: new Date(),
-        },
-      );
+    // try {
+    //   //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""
+    //   await databases.createRow(
+    //     DATABASE_ID,
+    //     HABITS_COLLECTION_ID,
+    //     ID.unique(),
+    //     {
+    //       user_id: user.$id,
+    //       title,
+    //       description,
+    //       frequency,
+    //       streak_count: 0,
+    //       last_completed: new Date(),
+    //       created_at: new Date(),
+    //     },
+    //   );
 
-      router.back();
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-        return;
-      }
-      setError("There was an error creating a habit");
-    }
+    //   router.back();
+    // } catch (error) {
+    //   if (error instanceof Error) {
+    //     setError(error.message);
+    //     return;
+    //   }
+    //   setError("There was an error creating a habit");
+    // }
   };
 
-  const handleDeleteHabit = async (id: string) => {
+  const handleDeleteHabitDraft = async (id: string) => {
     try {
-      await databases.deleteRow(DATABASE_ID, HABITS_COLLECTION_ID, id);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleCompleteHabit = async (id: string) => {
-    if (!user || completedHabits?.includes(id)) return;
-    try {
-      const currentDate = new Date();
-      await databases.createRow(
-        DATABASE_ID,
-        COMPLETIONS_COLLECTION_ID,
-        ID.unique(),
-        {
-          habit_id: id,
-          user_id: user.$id,
-          completed_at: currentDate.toISOString(),
-        },
-      );
-
-      const habit = habits?.find((h) => h.$id === id);
-
-      if (!habit) return;
-
-      await databases.updateRow(DATABASE_ID, HABITS_COLLECTION_ID, id, {
-        streak_count: habit.streak_count + 1,
-        last_completed: currentDate,
-      });
+      // await databases.deleteRow(DATABASE_ID, HABITS_COLLECTION_ID, id);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const isHabitCompleted = (habitId: string) =>
-    completedHabits?.includes(habitId);
+  const handleAddHabitDraft = async (id: string) => {
+    // if (!user || completedHabits?.includes(id)) return;
+    // try {
+    //   const currentDate = new Date();
+    //   await databases.createRow(
+    //     DATABASE_ID,
+    //     HABITS_COLLECTION_ID,
+    //     ID.unique(),
+    //     {
+    //       habit_id: id,
+    //       user_id: user.$id,
+    //       completed_at: currentDate.toISOString(),
+    //     },
+    //   );
+    //   const habit = habits?.find((h) => h.$id === id);
+    //   if (!habit) return;
+    //   await databases.updateRow(DATABASE_ID, HABITS_COLLECTION_ID, id, {
+    //     streak_count: habit.streak_count + 1,
+    //     last_completed: currentDate,
+    //   });
+    // } catch (error) {
+    //   console.error(error);
+    // }
+  };
+
+  const isHabitCompleted = (habitId: HabitDraft) =>
+    habitDrafts?.includes(habitId);
 
   //parenthesis not curly brackets because return a view
-  const renderRightActions = (habitId: string) => (
+  const renderRightActions = (habitId: HabitDraft) => (
     <View style={styles.swipeActionRight}>
       {isHabitCompleted(habitId) ? (
         <Text style={{ color: "#fff" }}>Added to Habits!</Text>
@@ -286,11 +339,13 @@ export default function AddHabitScreen() {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {habits?.length === 0 ? (
+        {/* habitDrafts?.length === 0 */}
+        {!loaded ? (
           <View style={styles.emptyState}>
             <TextInput
               label="I want to achieve: "
               mode="outlined"
+              placeholder="six pack"
               onChangeText={setTitle}
               style={styles.input}
             />
@@ -299,39 +354,39 @@ export default function AddHabitScreen() {
               onPress={getTasksAi}
               disabled={!title || !description}
             >
-              Add AI Habits
+              Add AI Habits to here
             </Button>
           </View>
         ) : (
-          habits?.map((habit, key) => (
+          habitDrafts?.map((habitDraft, key) => (
             <Swipeable
               ref={(ref) => {
-                swipeableRefs.current[habit.$id] = ref;
+                swipeableRefs.current[habitDraft.title] = ref;
               }}
               key={key}
               overshootLeft={false}
               overshootRight={false}
               renderLeftActions={renderLeftActions}
-              renderRightActions={() => renderRightActions(habit.$id)}
+              renderRightActions={() => renderRightActions(habitDraft)}
               onSwipeableOpen={(direction) => {
                 if (direction === "left") {
-                  handleDeleteHabit(habit.$id);
+                  handleDeleteHabitDraft(habitDraft.title);
                 } else if (direction === "right") {
-                  handleCompleteHabit(habit.$id);
+                  handleAddHabitDraft(habitDraft.title);
                 }
 
-                swipeableRefs.current[habit.$id]?.close();
+                swipeableRefs.current[habitDraft.title]?.close();
               }}
             >
               {/* overshootLeft={false} to make sure the swiping is not overly responsive */}
               <Surface style={[styles.card]} elevation={0}>
                 <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle}>{habit.title}</Text>
+                  <Text style={styles.cardTitle}>{habitDraft.title}</Text>
                   <Text style={styles.cardDescription}>
-                    {habit.description}
+                    {habitDraft.description}
                   </Text>
 
-                  <View style={styles.cardFooter}>
+                  {/* <View style={styles.cardFooter}>
                     <View style={styles.streakBadge}>
                       <MaterialCommunityIcons
                         name="fire"
@@ -348,23 +403,22 @@ export default function AddHabitScreen() {
                           habit.frequency.slice(1)}
                       </Text>
                     </View>
-                  </View>
+                  </View> */}
                 </View>
+                <Button
+                  mode="contained"
+                  onPress={handleSubmit}
+                  disabled={!title || !description}
+                >
+                  Add Habits To Routine
+                </Button>
               </Surface>
             </Swipeable>
           ))
         )}
-
-        <Button
-          mode="contained"
-          onPress={handleSubmit}
-          disabled={!title || !description}
-        >
-          Add Habits To Routine
-        </Button>
       </ScrollView>
 
-      <View style={styles.frequencyContainer}>
+      {/* <View style={styles.frequencyContainer}>
         <SegmentedButtons
           //setting initial value for the SegmentedButtons
           value={frequency}
@@ -374,7 +428,7 @@ export default function AddHabitScreen() {
             label: freq.charAt(0).toUpperCase() + freq.slice(1),
           }))}
         />
-      </View>
+      </View> */}
 
       {error && <Text style={{ color: theme.colors.error }}> {error}</Text>}
     </View>

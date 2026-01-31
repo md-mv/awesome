@@ -12,7 +12,7 @@ export interface Habit extends Models.DefaultRow {
 }
 
 export interface HabitCompletion extends Models.DefaultRow {
-  habit_id:string;
+  habit_id: string;
   user_id: string;
   completed_at: string;
 }
