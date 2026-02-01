@@ -17,7 +17,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Models.User<Models.Preferences> | null>(
-    null
+    null,
   );
 
   const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true); //start value
@@ -30,11 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const getUser = async () => {
     try {
       const session = await account.get();
-      setUser(session);
+      await setUser(session);
     } catch (error) {
-      setUser(null);
+      await setUser(null);
     } finally {
-      setIsLoadingUser(false);
+      await setIsLoadingUser(false);
     }
   };
 
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await account.createEmailPasswordSession(email, password);
       const session = await account.get();
-      setUser(session);
+      await setUser(session);
 
       return null;
     } catch (error) {
@@ -68,19 +68,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-
-
   const signOut = async () => {
     try {
-    await account.deleteSession("current");
-    setUser(null);
+      await account.deleteSession("current");
+      await setUser(null);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, isLoadingUser, signUp, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, isLoadingUser, signUp, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

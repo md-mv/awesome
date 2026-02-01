@@ -1,7 +1,7 @@
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "@/lib/auth-context";
 import { Button, Text, TextInput, useTheme } from "react-native-paper";
@@ -16,35 +16,48 @@ export default function AuthScreen() {
   const router = useRouter();
   const { signIn, signUp } = useAuth();
 
+  const navigation = useNavigation();
+  useEffect(() => {
+    console.log("auth useeffect");
+    const unsubscribe = navigation.addListener("focus", () => {
+      handleAuth();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
   const handleAuth = async () => {
+    console.log("handleAuth");
     if (!email || !password) {
-      setError("Please fill in all fields.");
+      await setError("Please fill in all fields.");
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      await setError("Password must be at least 6 characters long.");
       return;
     }
 
-    setError(null);
+    await setError(null);
     if (isSignUp) {
       const error = await signUp(email, password);
       if (error) {
-        setError(error);
+        await setError(error);
         return;
       }
     } else {
       const error = await signIn(email, password);
       if (error) {
-        setError(error);
-          return;
+        await setError(error);
+        return;
       }
 
-      router.replace("/")
+      router.replace("/");
     }
   };
   const handleSwitchMode = () => {
+    console.log("handleSwitchMode");
     setIsSignUp((prev) => !prev);
   };
 

@@ -29,6 +29,8 @@ export default function Index() {
 
   const navigation = useNavigation();
   useEffect(() => {
+    console.log(user);
+    console.log("index useeffect navigation");
     const unsubscribe = navigation.addListener("focus", () => {
       fetchHabits();
     });
@@ -36,9 +38,11 @@ export default function Index() {
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
-
+  // const router = useRouter();
+  // router.replace("/");
   useEffect(() => {
     if (user) {
+      console.log("index useeffect subscription");
       const habitsChannel = `databases.${DATABASE_ID}.tables.${HABITS_COLLECTION_ID}.rows`;
       const habitsSubscription = client.subscribe(
         habitsChannel,

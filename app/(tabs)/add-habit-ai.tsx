@@ -51,7 +51,7 @@ async function getData() {
   }
 }
 
-export default function AddHabitScreen() {
+export default function AddGoalScreen() {
   const [goal, setGoal] = useState<string>("");
   // const [description, setDescription] = useState<string>("");
   const [frequency, setFrequency] = useState<Frequency>("daily");
