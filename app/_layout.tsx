@@ -24,17 +24,17 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
   // router.replace("/auth");
   //run immediately when this component renders
   useEffect(() => {
-    console.log("layout useeffect");
+    // console.log("layout useeffect");
 
     if (!navigationState?.key) return;
     if (isLoadingUser) return;
     const inAuthGroup = segments[0] === "auth";
     if (!user && !inAuthGroup) {
-      console.log("layout useeffect not logged in");
+      // console.log("layout useeffect not logged in");
       //replace the user's current route with user's off route
       router.replace("/auth");
     } else if (user && inAuthGroup) {
-      console.log("layout useeffect logged in");
+      // console.log("layout useeffect logged in");
       router.replace("/");
     }
   }, [user, segments, isLoadingUser, navigationState]); // call it every time the user is changed, or segments are changed

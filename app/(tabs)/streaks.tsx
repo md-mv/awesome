@@ -89,7 +89,7 @@ export default function StreaksScreen() {
         HABITS_COLLECTION_ID,
         [Query.equal("user_id", user?.$id ?? "")],
       );
-      console.log(response.rows);
+      // console.log(response.rows);
       //Habit interface should extend the type  which is returned by response.rows
       await setHabits(response.rows as Habit[]);
     } catch (error) {
@@ -104,7 +104,7 @@ export default function StreaksScreen() {
         COMPLETIONS_COLLECTION_ID,
         [Query.equal("user_id", user?.$id ?? "")],
       );
-      console.log(response.rows);
+      // console.log(response.rows);
       const completions = response.rows as HabitCompletion[];
       //Habit interface should extend the type  which is returned by response.rows
       await setCompletedHabits(completions);

@@ -45,7 +45,6 @@ async function getData() {
     }
 
     const result = await response.json();
-    console.log(result);
   } catch (error) {
     console.error(error);
   }
@@ -70,33 +69,33 @@ export default function AddGoalScreen() {
   const [currentText, setCurrentText] = useState("");
 
   const texts = [
-    "Searching for WiFi",
-    "Calling the waiter",
-    "Asking for WiFi password",
-    "Connecting to the internet",
-    "Touching grass",
-    "Searching for GPU",
-    "Browsing Amazon",
-    "Looking for money to buy GPU",
-    "Did not find the money to buy GPU",
-    "Searching for CPU",
-    "Found CPU",
-    "Searching for AI model on the internet",
-    "Found llama 3",
-    "Sending the request to llama 3",
-    "Checking the format",
-    "Resending request",
-    "Connecting to database",
-    "Looking up NASA records",
-    "Flying to the Moon",
-    "Flying back",
-    "Running outside",
-    "Made a friend",
-    "It should have already given back the answer",
-    "Usually it does",
-    "Hold on tight",
-    "Tighter",
-    "You really should consider buying premium",
+    "Searching for WiFi...",
+    "Calling the waiter...",
+    "Asking for WiFi password...",
+    "Connecting to the internet...",
+    "Touching grass...",
+    "Searching for GPU...",
+    "Browsing Amazon...",
+    "Looking for money to buy GPU...",
+    "Did not find the money to buy GPU...",
+    "Searching for CPU...",
+    "Found CPU...",
+    "Searching for AI model on the internet...",
+    "Found llama 3...",
+    "Sending the request to llama 3...",
+    "Checking the format...",
+    "Resending request...",
+    "Connecting to database...",
+    "Looking up NASA records...",
+    "Flying to the Moon...",
+    "Flying back...",
+    "Running outside...",
+    "Made a friend...",
+    "It should have already given back the answer...",
+    "Usually it does...",
+    "Hold on tight...",
+    "Tighter...",
+    "You really should consider buying premium...",
   ];
   let point = -1;
   useEffect(() => {
@@ -110,7 +109,7 @@ export default function AddGoalScreen() {
           point = point + 1;
 
           // const nextIndex = point % texts.length;
-          console.log(texts[point]);
+          // console.log(texts[point]);
           return texts[point];
         });
       }, 5000);
@@ -162,8 +161,8 @@ export default function AddGoalScreen() {
           setError("There was an error creating a habit");
         }
       }
-      console.log(result);
-      console.log("tasks: ");
+      // console.log(result);
+      // console.log("tasks: ");
       const tasks = data.tasks;
 
       let res: HabitDraft[] = [];
@@ -179,22 +178,22 @@ export default function AddGoalScreen() {
 
       await setHabitDrafts(res as HabitDraft[]);
 
-      console.log("habit drafts: ");
-      console.log(habitDrafts);
-      console.log("hopefully it reaches here");
+      // console.log("habit drafts: ");
+      // console.log(habitDrafts);
+      // console.log("hopefully it reaches here");
 
-      performance.mark("request to AI API received");
+      // performance.mark("request to AI API received");
 
-      performance.measure(
-        "loadTime",
-        "request to AI API sent",
-        "request to AI API received",
-      );
+      // performance.measure(
+      //   "loadTime",
+      //   "request to AI API sent",
+      //   "request to AI API received",
+      // );
 
-      const measure = performance.getEntriesByName("loadTime")[0];
-      const loadTime = measure.duration / 1000; // Convert to seconds
+      // const measure = performance.getEntriesByName("loadTime")[0];
+      // const loadTime = measure.duration / 1000; // Convert to seconds
 
-      console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
+      // console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
       setLoading(false);
     } catch (error) {
       if (error instanceof Error) {
@@ -274,8 +273,8 @@ export default function AddGoalScreen() {
   const handleAddHabitDraft = async (id: string) => {
     //make sure the user exists before adding this
 
-    console.log("add habit handle");
-    console.log(id);
+    // console.log("add habit handle");
+    // console.log(id);
     if (!user) return;
     try {
       //  process.env.EXPO_PUBLIC_HABITS_COLLECTION_ID has to be in ' ' not in ""

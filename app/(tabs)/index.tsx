@@ -29,8 +29,8 @@ export default function Index() {
 
   const navigation = useNavigation();
   useEffect(() => {
-    console.log(user);
-    console.log("index useeffect navigation");
+    // console.log(user);
+    // console.log("index useeffect navigation");
     const unsubscribe = navigation.addListener("focus", () => {
       fetchHabits();
     });
@@ -42,7 +42,7 @@ export default function Index() {
   // router.replace("/");
   useEffect(() => {
     if (user) {
-      console.log("index useeffect subscription");
+      // console.log("index useeffect subscription");
       const habitsChannel = `databases.${DATABASE_ID}.tables.${HABITS_COLLECTION_ID}.rows`;
       const habitsSubscription = client.subscribe(
         habitsChannel,
@@ -89,7 +89,7 @@ export default function Index() {
         HABITS_COLLECTION_ID,
         [Query.equal("user_id", user?.$id ?? "")],
       );
-      console.log(responseH.rows);
+      // console.log(responseH.rows);
 
       // const responseC = await databases.listRows(
       //   DATABASE_ID,
@@ -146,7 +146,7 @@ export default function Index() {
           Query.greaterThanEqual("completed_at", today.toISOString()),
         ],
       );
-      console.log(response.rows);
+      // console.log(response.rows);
       const completions = response.rows as HabitCompletion[];
       //Habit interface should extend the type  which is returned by response.rows
       await setCompletedHabits(completions.map((c) => c.habit_id));
@@ -167,11 +167,11 @@ export default function Index() {
           Query.equal("habit_id", id ?? ""),
         ],
       );
-      console.log(response.rows);
+      // console.log(response.rows);
 
       for (let i = 0; i < response.rows.length; i++) {
-        console.log("to delete completion id: ");
-        console.log(response.rows[i].$id);
+        // console.log("to delete completion id: ");
+        // console.log(response.rows[i].$id);
         await databases.deleteRow(
           DATABASE_ID,
           COMPLETIONS_COLLECTION_ID,

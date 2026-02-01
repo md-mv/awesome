@@ -18,7 +18,7 @@ export default function AuthScreen() {
 
   const navigation = useNavigation();
   useEffect(() => {
-    console.log("auth useeffect");
+    // console.log("auth useeffect");
     const unsubscribe = navigation.addListener("focus", () => {
       handleAuth();
     });
@@ -28,7 +28,7 @@ export default function AuthScreen() {
   }, [navigation]);
 
   const handleAuth = async () => {
-    console.log("handleAuth");
+    // console.log("handleAuth");
     if (!email || !password) {
       await setError("Please fill in all fields.");
       return;
@@ -57,7 +57,7 @@ export default function AuthScreen() {
     }
   };
   const handleSwitchMode = () => {
-    console.log("handleSwitchMode");
+    // console.log("handleSwitchMode");
     setIsSignUp((prev) => !prev);
   };
 
