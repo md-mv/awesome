@@ -8,6 +8,7 @@ import {
 } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
 import { Habit, HabitCompletion } from "@/type/database.type";
+import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Query } from "react-native-appwrite";
@@ -19,6 +20,25 @@ export default function StreaksScreen() {
   const [completedHabits, setCompletedHabits] = useState<HabitCompletion[]>([]);
 
   const { user } = useAuth();
+  // const router = useRouter();
+
+  const navigation = useNavigation();
+  useEffect(() => {
+    // if (route.params?.refreshTimeStamp) {
+    //   void refreshData();
+    // }
+
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchHabits();
+      fetchCompletions();
+      // alert("Screen is focused");
+      // The screen is focused
+      // Call any action
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     if (user) {
@@ -71,7 +91,7 @@ export default function StreaksScreen() {
       );
       console.log(response.rows);
       //Habit interface should extend the type  which is returned by response.rows
-      setHabits(response.rows as Habit[]);
+      await setHabits(response.rows as Habit[]);
     } catch (error) {
       console.error(error);
     }
@@ -87,7 +107,7 @@ export default function StreaksScreen() {
       console.log(response.rows);
       const completions = response.rows as HabitCompletion[];
       //Habit interface should extend the type  which is returned by response.rows
-      setCompletedHabits(completions);
+      await setCompletedHabits(completions);
     } catch (error) {
       console.error(error);
     }

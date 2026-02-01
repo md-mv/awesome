@@ -100,24 +100,24 @@ export default function AddHabitScreen() {
   ];
   let point = -1;
   useEffect(() => {
-    // if (loading) {
-    const intervalId = setInterval(() => {
-      setCurrentText((prevText) => {
-        // const currentIndex = texts.indexOf(prevText);
-        if (point >= texts.length - 1) {
-          point = -1;
-        }
-        point = point + 1;
+    if (loading) {
+      const intervalId = setInterval(() => {
+        setCurrentText((prevText) => {
+          // const currentIndex = texts.indexOf(prevText);
+          if (point >= texts.length - 1) {
+            point = -1;
+          }
+          point = point + 1;
 
-        // const nextIndex = point % texts.length;
-        console.log(texts[point]);
-        return texts[point];
-      });
-    }, 5000);
+          // const nextIndex = point % texts.length;
+          console.log(texts[point]);
+          return texts[point];
+        });
+      }, 5000);
 
-    return () => clearInterval(intervalId); // Clean up on unmount
-    // }
-  }, []);
+      return () => clearInterval(intervalId); // Clean up on unmount
+    }
+  }, [loading]);
 
   //   function resolveAfterMinutes() {
   //   return new Promise((resolve) => {
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   loadingText: {
-    marginTop: 50,
+    marginTop: 100,
     color: "#1a2a88",
     fontWeight: "bold",
     fontSize: 14,

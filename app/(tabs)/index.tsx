@@ -9,6 +9,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { Habit, HabitCompletion } from "@/type/database.type";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { ID, Query } from "react-native-appwrite";
@@ -25,6 +26,16 @@ export default function Index() {
   const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
   //call this function every time the user changes
+
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchHabits();
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     if (user) {
