@@ -72,8 +72,9 @@ export default function AddHabitScreen() {
   const texts = [
     "Searching for WiFi",
     "Calling the waiter",
-    "Asking for password",
+    "Asking for WiFi password",
     "Connecting to the internet",
+    "Touching grass",
     "Searching for GPU",
     "Browsing Amazon",
     "Looking for money to buy GPU",
@@ -346,7 +347,7 @@ export default function AddHabitScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           <Text disabled={habitDrafts?.length === 0} style={styles.goalText}>
-            Your Goal : {goal}
+            Your Goal: {goal}
           </Text>
         </View>
         {/* <Button

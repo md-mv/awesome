@@ -112,7 +112,7 @@ export default function Index() {
       // }
 
       //Habit interface should extend the type  which is returned by response.rows
-      setHabits(responseH.rows as Habit[]);
+      await setHabits(responseH.rows as Habit[]);
     } catch (error) {
       console.error(error);
     }
@@ -134,7 +134,7 @@ export default function Index() {
       console.log(response.rows);
       const completions = response.rows as HabitCompletion[];
       //Habit interface should extend the type  which is returned by response.rows
-      setCompletedHabits(completions.map((c) => c.habit_id));
+      await setCompletedHabits(completions.map((c) => c.habit_id));
     } catch (error) {
       console.error(error);
     }
@@ -163,6 +163,9 @@ export default function Index() {
           response.rows[i].$id,
         );
       }
+
+      fetchHabits();
+      fetchTodayCompletions();
     } catch (error) {
       console.error(error);
     }
@@ -191,6 +194,9 @@ export default function Index() {
         streak_count: habit.streak_count + 1,
         last_completed: currentDate,
       });
+
+      fetchHabits();
+      fetchTodayCompletions();
     } catch (error) {
       console.error(error);
     }
