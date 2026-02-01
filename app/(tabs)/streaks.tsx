@@ -37,7 +37,7 @@ export default function StreaksScreen() {
           ) {
             fetchHabits();
           }
-        }
+        },
       );
 
       const completionsChannel = `databases.${DATABASE_ID}.tables.${COMPLETIONS_COLLECTION_ID}.rows`;
@@ -47,7 +47,7 @@ export default function StreaksScreen() {
           if (response.events.includes("databases.*.tables.*.rows.*.create")) {
             fetchCompletions();
           }
-        }
+        },
       );
 
       fetchHabits();
@@ -67,7 +67,7 @@ export default function StreaksScreen() {
       const response = await databases.listRows(
         DATABASE_ID,
         HABITS_COLLECTION_ID,
-        [Query.equal("user_id", user?.$id ?? "")]
+        [Query.equal("user_id", user?.$id ?? "")],
       );
       console.log(response.rows);
       //Habit interface should extend the type  which is returned by response.rows
@@ -82,7 +82,7 @@ export default function StreaksScreen() {
       const response = await databases.listRows(
         DATABASE_ID,
         COMPLETIONS_COLLECTION_ID,
-        [Query.equal("user_id", user?.$id ?? "")]
+        [Query.equal("user_id", user?.$id ?? "")],
       );
       console.log(response.rows);
       const completions = response.rows as HabitCompletion[];
@@ -106,7 +106,7 @@ export default function StreaksScreen() {
       .sort(
         (a, b) =>
           new Date(a.completed_at).getTime() -
-          new Date(b.completed_at).getTime()
+          new Date(b.completed_at).getTime(),
       );
 
     if (habitCompletions?.length === 0) {
@@ -133,27 +133,38 @@ export default function StreaksScreen() {
           currentStreak = 1;
         }
       } else {
-       currentStreak = 1;
+        currentStreak = 1;
       }
-       if (currentStreak > bestStreak) bestStreak = currentStreak;
-        streak = currentStreak;
-        lastDate = date;
+      if (currentStreak > bestStreak) bestStreak = currentStreak;
+      streak = currentStreak;
+      lastDate = date;
     });
 
     return { streak, bestStreak, total };
   };
 
-  const habitStreaks = habits.map((habit) => {
+  const loadStreaks = () => {
+    let habitStreaks = habits.map((habit) => {
+      const { streak, bestStreak, total } = getStreakData(habit.$id);
+      return { habit, bestStreak, streak, total };
+    });
+
+    let rankedHabits = habitStreaks.sort((a, b) => b.bestStreak - a.bestStreak);
+    // console.log(rankedHabits.map((h) => h.habit.title));
+
+    let badgeStyles = [styles.badge1, styles.badge2, styles.badge3];
+  };
+  let habitStreaks = habits.map((habit) => {
     const { streak, bestStreak, total } = getStreakData(habit.$id);
     return { habit, bestStreak, streak, total };
   });
 
-  const rankedHabits = habitStreaks.sort((a, b) => b.bestStreak - a.bestStreak);
+  let rankedHabits = habitStreaks.sort((a, b) => b.bestStreak - a.bestStreak);
   // console.log(rankedHabits.map((h) => h.habit.title));
 
-  const badgeStyles = [styles.badge1, styles.badge2, styles.badge3];
+  let badgeStyles = [styles.badge1, styles.badge2, styles.badge3];
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onFocus={loadStreaks}>
       <Text style={styles.title} variant="headlineSmall">
         Habit Streaks
       </Text>
@@ -190,10 +201,7 @@ export default function StreaksScreen() {
                 <Text variant="titleMedium" style={styles.habitTitle}>
                   {habit.title}
                 </Text>
-                <Text style={styles.habitDescription}>
-                  {" "}
-                  {habit.description}
-                </Text>
+                <Text style={styles.habitDescription}>{habit.description}</Text>
                 <View style={styles.statsRow}>
                   <View style={styles.statBadge}>
                     <Text style={styles.statBadgeText}>🔥 {streak} </Text>
@@ -354,7 +362,7 @@ const styles = StyleSheet.create({
   },
   rankingStreak: {
     fontSize: 14,
-     color: "#7c4dff",
-     fontWeight: "bold",
+    color: "#7c4dff",
+    fontWeight: "bold",
   },
 });

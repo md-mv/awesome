@@ -536,9 +536,10 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 50,
-    color: "#ff9800",
+    color: "#1a2a88",
     fontWeight: "bold",
     fontSize: 14,
+    justifyContent: "center",
   },
   goalText: {
     fontSize: 22,

@@ -43,7 +43,7 @@ export default function Index() {
           ) {
             fetchHabits();
           }
-        }
+        },
       );
 
       const completionsChannel = `databases.${DATABASE_ID}.tables.${COMPLETIONS_COLLECTION_ID}.rows`;
@@ -53,7 +53,7 @@ export default function Index() {
           if (response.events.includes("databases.*.tables.*.rows.*.create")) {
             fetchTodayCompletions();
           }
-        }
+        },
       );
 
       fetchHabits();
@@ -69,14 +69,50 @@ export default function Index() {
   const fetchHabits = async () => {
     try {
       //if user == null then put "" instead
-      const response = await databases.listRows(
+      const responseH = await databases.listRows(
         DATABASE_ID,
         HABITS_COLLECTION_ID,
-        [Query.equal("user_id", user?.$id ?? "")]
+        [Query.equal("user_id", user?.$id ?? "")],
       );
-      console.log(response.rows);
+      console.log(responseH.rows);
+
+      // const responseC = await databases.listRows(
+      //   DATABASE_ID,
+      //   COMPLETIONS_COLLECTION_ID,
+      //   [Query.equal("user_id", user?.$id ?? "")],
+      // );
+      // console.log(responseC.rows);
+
+      // for (let i = 0; i < responseC.rows.length; i++) {
+      //   let toDelete = true;
+      //   for (let j = 0; j < responseH.rows.length; j++) {
+      //     if (responseC.rows[i].habit_id == responseH.rows[j].$id) {
+      //       toDelete = false;
+      //     }
+      //   }
+      //   // const response = await databases.listRows(
+      //   //   DATABASE_ID,
+      //   //   COMPLETIONS_COLLECTION_ID,
+      //   //   [
+      //   //     Query.equal("user_id", user?.$id ?? ""),
+      //   //     Query.equal("habit_id", id ?? ""),
+      //   //   ],
+      //   // );
+      //   // console.log(response.rows);
+
+      //   // for (let i = 0; i < response.rows.length; i++) {
+      //   console.log("to delete completion id: ");
+      //   console.log(responseC.rows[i].$id);
+      //   await databases.deleteRow(
+      //     DATABASE_ID,
+      //     COMPLETIONS_COLLECTION_ID,
+      //     responseC.rows[i].$id,
+      //   );
+      //   // }
+      // }
+
       //Habit interface should extend the type  which is returned by response.rows
-      setHabits(response.rows as Habit[]);
+      setHabits(responseH.rows as Habit[]);
     } catch (error) {
       console.error(error);
     }
@@ -93,7 +129,7 @@ export default function Index() {
         [
           Query.equal("user_id", user?.$id ?? ""),
           Query.greaterThanEqual("completed_at", today.toISOString()),
-        ]
+        ],
       );
       console.log(response.rows);
       const completions = response.rows as HabitCompletion[];
@@ -107,6 +143,26 @@ export default function Index() {
   const handleDeleteHabit = async (id: string) => {
     try {
       await databases.deleteRow(DATABASE_ID, HABITS_COLLECTION_ID, id);
+
+      const response = await databases.listRows(
+        DATABASE_ID,
+        COMPLETIONS_COLLECTION_ID,
+        [
+          Query.equal("user_id", user?.$id ?? ""),
+          Query.equal("habit_id", id ?? ""),
+        ],
+      );
+      console.log(response.rows);
+
+      for (let i = 0; i < response.rows.length; i++) {
+        console.log("to delete completion id: ");
+        console.log(response.rows[i].$id);
+        await databases.deleteRow(
+          DATABASE_ID,
+          COMPLETIONS_COLLECTION_ID,
+          response.rows[i].$id,
+        );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -124,7 +180,7 @@ export default function Index() {
           habit_id: id,
           user_id: user.$id,
           completed_at: currentDate.toISOString(),
-        }
+        },
       );
 
       const habit = habits?.find((h) => h.$id === id);
@@ -147,7 +203,7 @@ export default function Index() {
   const renderRightActions = (habitId: string) => (
     <View style={styles.swipeActionRight}>
       {isHabitCompleted(habitId) ? (
-        <Text style={{color:"#fff"}}>Completed!</Text>
+        <Text style={{ color: "#fff" }}>Completed!</Text>
       ) : (
         <MaterialCommunityIcons
           name="check-circle-outline"
