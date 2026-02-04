@@ -1,4 +1,5 @@
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import * as Clarity from "@microsoft/react-native-clarity";
 import {
   Stack,
   useRootNavigationState,
@@ -35,6 +36,9 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
       router.replace("/auth");
     } else if (user && inAuthGroup) {
       // console.log("layout useeffect logged in");
+      Clarity.sendCustomEvent("UserLoggedIn");
+      Clarity.setCustomUserId(user.$id);
+      Clarity.setCustomSessionId("" + user.$id + "__" + Date.now());
       router.replace("/");
     }
   }, [user, segments, isLoadingUser, navigationState]); // call it every time the user is changed, or segments are changed

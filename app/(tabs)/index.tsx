@@ -1,4 +1,5 @@
 import {
+  CLARITY_PROJECT_ID,
   client,
   COMPLETIONS_COLLECTION_ID,
   DATABASE_ID,
@@ -16,7 +17,11 @@ import { ID, Query } from "react-native-appwrite";
 import { Swipeable } from "react-native-gesture-handler";
 import { Button, Surface, Text } from "react-native-paper";
 
-// import {  } from "react-native";
+import * as Clarity from "@microsoft/react-native-clarity";
+
+Clarity.initialize(`${CLARITY_PROJECT_ID}`, {
+  logLevel: Clarity.LogLevel.Verbose,
+});
 export default function Index() {
   const { signOut, user } = useAuth();
 

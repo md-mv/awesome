@@ -19,6 +19,7 @@ export const COMPLETIONS_COLLECTION_ID =
 export const AI_HOST = process.env.EXPO_PUBLIC_AI_HOST_IP!;
 export const API_HOST = process.env.EXPO_PUBLIC_API_HOST_IP!;
 
+export const CLARITY_PROJECT_ID = process.env.EXPO_PUBLIC_CLARITY_PROJECT_ID!;
 export interface RealtimeResponse {
   events: string[];
   payload: any;

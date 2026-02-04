@@ -69,6 +69,7 @@ export default function AddGoalScreen() {
   const [currentText, setCurrentText] = useState("");
 
   const texts = [
+    "Loading...",
     "Searching for WiFi...",
     "Calling the waiter...",
     "Asking for WiFi password...",
@@ -95,7 +96,7 @@ export default function AddGoalScreen() {
     "Usually it does...",
     "Hold on tight...",
     "Tighter...",
-    "You really should consider buying premium...",
+    "You really should consider buying paid version...",
   ];
   let point = -1;
   useEffect(() => {
@@ -132,10 +133,7 @@ export default function AddGoalScreen() {
 
     // await resolveAfter3Minutes();
     setLoading(true);
-    performance.mark("request to AI API sent");
-    // const task = "happiness";
-    //   const task = "happiness";
-    // const response = await fetch(`${API_HOST}` + "/items/" + task);
+    // performance.mark("request to AI API sent");
 
     try {
       let data;
