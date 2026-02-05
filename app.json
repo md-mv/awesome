@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "habit-app",
+    "name": "Awesome - Habit App",
     "slug": "habit-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,6 +20,11 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+      // "permissions": [
+      //   "READ_EXTERNAL_STORAGE",
+      //   "WRITE_EXTERNAL_STORAGE",
+      //   "INTERNET"
+      // ],
       "package": "com.awearti.habitapp"
     },
     "web": {
@@ -39,7 +44,9 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-build-properties"
+      // ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -129,6 +129,11 @@ export default function AddGoalScreen() {
 
   // let loaded = false;
   const getTasksAi = async () => {
+    const webPoint = `${API_HOST}/goals`;
+    //DONT PUT COMMENTS RIGHT AFTER FUNCTION START!!!
+    // setError(error + " in getTasksAi");
+    // setError(error + " " + webPoint);
+    // uri: Platform.OS === 'android' ? 'file://' : '' + capturedImageUri
     // const result = await getData();
 
     // await resolveAfter3Minutes();
@@ -141,7 +146,7 @@ export default function AddGoalScreen() {
       let jsonCorrect = false;
       while (!jsonCorrect) {
         try {
-          const response = await fetch(`${API_HOST}/goals`, {
+          const response = await fetch(webPoint, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -149,6 +154,7 @@ export default function AddGoalScreen() {
             body: JSON.stringify({ name: goal }),
           });
           result = await response.json();
+          // setError(error + "+ " + result);
           data = JSON.parse(result);
           jsonCorrect = true;
         } catch (er) {
@@ -193,9 +199,9 @@ export default function AddGoalScreen() {
 
       // console.log(`Page loaded in ${loadTime.toFixed(2)} seconds.`);
       setLoading(false);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
+    } catch (errorr) {
+      if (errorr instanceof Error) {
+        setError(errorr.message);
         return;
       }
       setError("There was an error creating a habit");

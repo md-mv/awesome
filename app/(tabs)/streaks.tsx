@@ -169,10 +169,10 @@ export default function StreaksScreen() {
       return { habit, bestStreak, streak, total };
     });
 
-    let rankedHabits = habitStreaks.sort((a, b) => b.bestStreak - a.bestStreak);
+    rankedHabits = habitStreaks.sort((a, b) => b.bestStreak - a.bestStreak);
     // console.log(rankedHabits.map((h) => h.habit.title));
 
-    let badgeStyles = [styles.badge1, styles.badge2, styles.badge3];
+    badgeStyles = [styles.badge1, styles.badge2, styles.badge3];
   };
   let habitStreaks = habits.map((habit) => {
     const { streak, bestStreak, total } = getStreakData(habit.$id);
